@@ -3,105 +3,105 @@ package com.example.lista1_ex9
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
+    var vezesJogada: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var textom: TextView = findViewById(R.id.textov)
 
-        var texto: TextView = findViewById(R.id.textview)
-        var xvez = true
-
+        var xvez: Boolean
         var btn1: Button = findViewById(R.id.btn1)
-        var btn2: Button = findViewById(R.id.btn2)
-        var btn3: Button = findViewById(R.id.btn3)
-        var btn4: Button = findViewById(R.id.btn4)
-        var btn5: Button = findViewById(R.id.btn5)
-        var btn6: Button = findViewById(R.id.btn6)
-        var btn7: Button = findViewById(R.id.btn7)
-        var btn8: Button = findViewById(R.id.btn8)
-        var btn9: Button = findViewById(R.id.btn9)
 
         btn1.setOnClickListener {
-            if(xvez){
-                btn1.text = "X"
-                xvez = false
-            }else{
-                btn1.text = "O"
-                xvez = true
-            }
+            textom.text = ""
+            vezesJogada = 0
+            xvez = true
+            criarTabuleiro(xvez)
         }
-        btn2.setOnClickListener {
-            if(xvez){
-                btn2.text = "X"
-                xvez = false
-            }else{
-                btn2.text = "O"
-                xvez = true
+
+    }
+    fun criarTabuleiro(xvez:Boolean){
+        var vez = xvez
+        var tabuleiro = Array(3) {IntArray(3)}
+
+        val layoutPrincipal: LinearLayout = findViewById(R.id.linearl)
+        layoutPrincipal.removeAllViews()
+
+        for(j in 1..3){
+            val linearLayout = LinearLayout(this)
+            linearLayout.orientation = LinearLayout.HORIZONTAL
+
+            for(i in 1..3){
+                val button = Button(this)
+                button.layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                button.text = "-"
+                button.setOnClickListener {
+                    vezesJogada++
+                    if(vez){
+                        button.text = "X"
+                        vez = false
+                        tabuleiro[j-1][i-1] = 1
+                    }else{
+                        button.text = "O"
+                        vez = true
+                        tabuleiro[j-1][i-1] = 2
+                    }
+                    button.isEnabled = false
+                    analisarV(tabuleiro)
+                }
+                linearLayout.addView(button)
+
             }
+            layoutPrincipal.addView(linearLayout)
         }
-        btn3.setOnClickListener {
-            if(xvez){
-                btn3.text = "X"
-                xvez = false
-            }else{
-                btn3.text = "O"
-                xvez = true
+    }
+
+    fun analisarV(ta: Array<IntArray>){
+        var textom: TextView = findViewById(R.id.textov)
+        //empate
+        if(vezesJogada == 9){
+            textom.text = "Empate!"
+        }
+        if(vezesJogada >= 5){
+            //diagonais
+            if(ta[0][0] == ta[1][1] && ta[1][1] == ta[2][2]){
+                if(ta[0][0] == 1)
+                    textom.text = "d1 Vitória de X"
+                else
+                    textom.text = "d1 Vitória de O"
             }
-        }
-        btn4.setOnClickListener {
-            if(xvez){
-                btn4.text = "X"
-                xvez = false
-            }else{
-                btn4.text = "O"
-                xvez = true
+
+            if(ta[0][2] == ta[1][1] && ta[1][1] == ta[2][0]){
+                if(ta[0][2] == 1)
+                    textom.text = "d2 Vitória de X"
+                else
+                    textom.text = "d2 Vitória de O"
             }
-        }
-        btn5.setOnClickListener {
-            if(xvez){
-                btn5.text = "X"
-                xvez = false
-            }else{
-                btn5.text = "O"
-                xvez = true
+
+            //horizontal
+            for(i in 0..2){
+                if(ta[i][0] == ta[i][1] && ta[i][1] == ta[i][2]){
+                    if(ta[i][0] == 1)
+                        textom.text = "h Vitória de X"
+                    else
+                        textom.text = "h Vitória de O"
+                }
             }
-        }
-        btn6.setOnClickListener {
-            if(xvez){
-                btn6.text = "X"
-                xvez = false
-            }else{
-                btn6.text = "O"
-                xvez = true
-            }
-        }
-        btn7.setOnClickListener {
-            if(xvez){
-                btn7.text = "X"
-                xvez = false
-            }else{
-                btn7.text = "O"
-                xvez = true
-            }
-        }
-        btn8.setOnClickListener {
-            if(xvez){
-                btn8.text = "X"
-                xvez = false
-            }else{
-                btn8.text = "O"
-                xvez = true
-            }
-        }
-        btn9.setOnClickListener {
-            if(xvez){
-                btn9.text = "X"
-                xvez = false
-            }else{
-                btn9.text = "O"
-                xvez = true
+            //vertical
+            for(i in 0..2){
+                if(ta[0][i] == ta[1][i] && ta[1][i] == ta[2][i]){
+                    if(ta[0][i] == 1)
+                        textom.text = "v Vitória de X"
+                    else
+                        textom.text = "v Vitória de O"
+                }
             }
         }
 
