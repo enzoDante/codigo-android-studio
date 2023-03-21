@@ -49,13 +49,14 @@
                 android:orientation="vertical"
                 android:id="@+id/pedidos"
                 >
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="outroo" />
-
 
             </LinearLayout>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Finalizar pedido"
+                android:id="@+id/btn"
+                />
 
 
         </LinearLayout>

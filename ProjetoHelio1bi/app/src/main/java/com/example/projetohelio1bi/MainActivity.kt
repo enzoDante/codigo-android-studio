@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        var btnFinalizar: Button = findViewById(R.id.btn)
         var checbRefri: CheckBox = findViewById(R.id.cbRefri)
         var checbPiz: CheckBox = findViewById(R.id.cbPiz)
         var checbSob: CheckBox = findViewById(R.id.cbSobr)
@@ -39,6 +40,10 @@ class MainActivity : AppCompatActivity() {
         }
         checbSob.setOnCheckedChangeListener { buttonView, isChecked ->
             carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+        }
+
+        btnFinalizar.setOnClickListener {
+            finalizarPedido()
         }
 
     }
@@ -68,20 +73,9 @@ class MainActivity : AppCompatActivity() {
 
                         if(checbR || checbP || checbS){
                             if( (checbR && (type=="refrigerante")) || (checbP && (type=="pizza")) || (checbS && (type=="sobremesa")) )
-                                criarProdutosDinamicos(idProduto, type, nome, desc, qtd, img)
+                                criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img)
                         }else
-                            criarProdutosDinamicos(idProduto, type, nome, desc, qtd, img)
-
-
-
-                        /*var novoTextView = TextView(this)
-
-                        novoTextView.layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        novoTextView.text = idProduto + " - " +type
-                        linearProdutos.addView(novoTextView)*/
+                            criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img)
                         println(idProduto + " -teste " +type)
                     }
                 },
@@ -96,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         queue.add(stringReq)
     }
 
-    fun criarProdutosDinamicos(idProduto: String, type: String, nome:String, desc:String, qtd:String, img:String){
+    fun criarProdutosDinamicos(idProduto: String, type: String, nome:String, desc:String, qtd:String, preco:String, img:String){
         val linearProdutos: LinearLayout = findViewById(R.id.produtos)
         linearProdutos.scrollY
         var bloco = LinearLayout(this)
@@ -126,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        novoTextView.text = idProduto + " ${nome} " +type + "\n "//${desc}
+        novoTextView.text = "${type} -> ${nome} R$ ${preco} \n "//${desc}
 
         //botao para adicionar produto em pedido
         val adicionar = Button(this)
@@ -156,7 +150,13 @@ class MainActivity : AppCompatActivity() {
 
     }
     fun adicionarPedido(){
+        var linearPedido: LinearLayout = findViewById(R.id.pedidos)
 
+    }
+    fun finalizarPedido(){
+        var linearpedido: LinearLayout = findViewById(R.id.pedidos)
+        linearpedido.removeAllViews()
+        //...falta coisa (enviar post)
     }
     @SuppressLint("StaticFieldLeak")
     @Suppress("DEPRECATION")
