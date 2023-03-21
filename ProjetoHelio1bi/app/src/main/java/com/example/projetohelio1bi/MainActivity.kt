@@ -1,14 +1,19 @@
 package com.example.projetohelio1bi
 
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.marginBottom
+import android.widget.Toast
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -21,18 +26,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        carregarProdutos()
+        var checbRefri: CheckBox = findViewById(R.id.cbRefri)
+        var checbPiz: CheckBox = findViewById(R.id.cbPiz)
+        var checbSob: CheckBox = findViewById(R.id.cbSobr)
+        carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+
+        checbRefri.setOnCheckedChangeListener { buttonView, isChecked ->
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+        }
+        checbPiz.setOnCheckedChangeListener { buttonView, isChecked ->
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+        }
+        checbSob.setOnCheckedChangeListener { buttonView, isChecked ->
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+        }
 
     }
-    fun carregarProdutos(){
-        println("testataeaeteat=======")
+    fun carregarProdutos(checbR: Boolean, checbP: Boolean, checbS: Boolean) {
+        val linearProdutos: LinearLayout = findViewById(R.id.produtos)
+        linearProdutos.removeAllViews()
+
         val queue = Volley.newRequestQueue(this)
         val url = "http://helioesperidiao.com/api.php"
         val requestBody = "id=1" + "&msg=test_msg"
         val stringReq : StringRequest =
             object : StringRequest(Method.POST, url,
                 Response.Listener { response ->
-                    val linearProdutos: LinearLayout = findViewById(R.id.produtos)
+
                     var resposta = response.toString()
                     val array = JSONArray(resposta)
                     val tamanho =array.length()
@@ -45,7 +65,15 @@ class MainActivity : AppCompatActivity() {
                         var qtd = item.get("qtd").toString();
                         var preco = item.get("preco").toString();
                         var img = item.get("img").toString();
-                        criarProdutosDinamicos(idProduto, type, nome, desc, qtd, img)
+
+                        if(checbR || checbP || checbS){
+                            if( (checbR && (type=="refrigerante")) || (checbP && (type=="pizza")) || (checbS && (type=="sobremesa")) )
+                                criarProdutosDinamicos(idProduto, type, nome, desc, qtd, img)
+                        }else
+                            criarProdutosDinamicos(idProduto, type, nome, desc, qtd, img)
+
+
+
                         /*var novoTextView = TextView(this)
 
                         novoTextView.layoutParams = LinearLayout.LayoutParams(
@@ -73,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.scrollY
         var bloco = LinearLayout(this)
 
-        //bloco.marginBottom
+        //bloco linear layout de produto
         bloco.orientation = LinearLayout.VERTICAL
         bloco.setBackgroundColor(Color.parseColor("#D6D6D6"))
 
@@ -82,15 +110,26 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
+        //criar imagem
+        var imagev = ImageView(this)
+        imagev.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        //carregar img
+        DownloadImageFromInternet(imagev).execute(img)
+        //carregarImg(img)
 
+        //texto do produto
         var novoTextView = TextView(this)
 
         novoTextView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        novoTextView.text = idProduto + " ${nome} " +type + "\n ${desc}"
+        novoTextView.text = idProduto + " ${nome} " +type + "\n "//${desc}
 
+        //botao para adicionar produto em pedido
         val adicionar = Button(this)
         adicionar.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -98,6 +137,7 @@ class MainActivity : AppCompatActivity() {
         )
         adicionar.text = "Adicionar pedido"
 
+        bloco.addView(imagev)
         bloco.addView(novoTextView)
         bloco.addView(adicionar)
 
@@ -113,5 +153,32 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(espaco)
 
     }
+    fun carregarImg(img:String){
+
+    }
+    @SuppressLint("StaticFieldLeak")
+    @Suppress("DEPRECATION")
+    private inner class DownloadImageFromInternet(var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
+        init {
+            Toast.makeText(applicationContext, "Carregando imagem", Toast.LENGTH_SHORT).show()
+        }
+        override fun doInBackground(vararg urls: String): Bitmap? {
+            val imageURL = urls[0]
+            var image: Bitmap? = null
+            try {
+                val `in` = java.net.URL(imageURL).openStream()
+                image = BitmapFactory.decodeStream(`in`)
+            }
+            catch (e: Exception) {
+                Log.e("Error Message", e.message.toString())
+                e.printStackTrace()
+            }
+            return image
+        }
+        override fun onPostExecute(result: Bitmap?) {
+            imageView.setImageBitmap(result)
+        }
+    }
+
 
 }
