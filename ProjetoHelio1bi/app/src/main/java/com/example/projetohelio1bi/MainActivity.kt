@@ -118,7 +118,6 @@ class MainActivity : AppCompatActivity() {
         )
         //carregar img
         DownloadImageFromInternet(imagev).execute(img)
-        //carregarImg(img)
 
         //texto do produto
         var novoTextView = TextView(this)
@@ -135,7 +134,10 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        adicionar.text = "Adicionar pedido"
+        adicionar.text = "Adicionar ao pedido"
+        adicionar.setOnClickListener {
+            adicionarPedido()
+        }
 
         bloco.addView(imagev)
         bloco.addView(novoTextView)
@@ -153,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(espaco)
 
     }
-    fun carregarImg(img:String){
+    fun adicionarPedido(){
 
     }
     @SuppressLint("StaticFieldLeak")
