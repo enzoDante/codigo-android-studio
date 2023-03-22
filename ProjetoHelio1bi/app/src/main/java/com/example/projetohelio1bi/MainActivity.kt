@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
         novoTextView.text = "${type} -> ${nome} R$ ${preco} \n "//${desc}
+        novoTextView.textSize = 20F
 
         //botao para adicionar produto em pedido
         val adicionar = Button(this)
