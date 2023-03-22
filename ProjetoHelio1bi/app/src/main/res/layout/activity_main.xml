@@ -51,6 +51,19 @@
                 >
 
             </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="45dp"
+                android:text="Preço total: R$"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="45dp"
+                android:id="@+id/total"
+                android:text="0"
+                />
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

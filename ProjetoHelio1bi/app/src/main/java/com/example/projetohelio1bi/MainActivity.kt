@@ -20,6 +20,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.charset.Charset
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +78,7 @@ class MainActivity : AppCompatActivity() {
                         }else
                             criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img)
                         println(idProduto + " -teste " +type)
+
                     }
                 },
                 Response.ErrorListener { error ->
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         )
         adicionar.text = "Adicionar ao pedido"
         adicionar.setOnClickListener {
-            adicionarPedido()
+            adicionarPedido(idProduto, nome, preco)
         }
 
         bloco.addView(imagev)
@@ -149,13 +151,38 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(espaco)
 
     }
-    fun adicionarPedido(){
+    fun adicionarPedido(id:String, nome:String, preco:String){
         var linearPedido: LinearLayout = findViewById(R.id.pedidos)
+        var total: TextView = findViewById(R.id.total)
+
+        var bloco = LinearLayout(this)
+        //bloco linear layout de produto
+        bloco.orientation = LinearLayout.VERTICAL
+        bloco.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        //texto do produto
+        var novoTextView = TextView(this)
+
+        novoTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        novoTextView.text = "Código: ${id} -> ${nome} R$ ${preco} \n "
+        novoTextView.textSize = 25F
+
+        bloco.addView(novoTextView)
+        linearPedido.addView(bloco)
+
+        total.text = (total.text.toString().toFloat() + preco.toFloat()).toString()
 
     }
     fun finalizarPedido(){
         var linearpedido: LinearLayout = findViewById(R.id.pedidos)
+        var total: TextView = findViewById(R.id.total)
         linearpedido.removeAllViews()
+        total.text = "0"
         //...falta coisa (enviar post)
     }
     @SuppressLint("StaticFieldLeak")
