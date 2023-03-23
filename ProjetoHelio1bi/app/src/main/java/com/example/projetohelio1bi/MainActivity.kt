@@ -23,32 +23,36 @@ import java.nio.charset.Charset
 import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
+
+    var alterarArray = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        var ProdutosPedidos = mutableListOf(mutableMapOf("id" to "0", "nome" to "-", "quant" to "0", "preco" to "0.0", "total" to "0.0"))
 
         var btnFinalizar: Button = findViewById(R.id.btn)
         var checbRefri: CheckBox = findViewById(R.id.cbRefri)
         var checbPiz: CheckBox = findViewById(R.id.cbPiz)
         var checbSob: CheckBox = findViewById(R.id.cbSobr)
-        carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+        carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
 
         checbRefri.setOnCheckedChangeListener { buttonView, isChecked ->
-            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
         }
         checbPiz.setOnCheckedChangeListener { buttonView, isChecked ->
-            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
         }
         checbSob.setOnCheckedChangeListener { buttonView, isChecked ->
-            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked)
+            carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
         }
 
         btnFinalizar.setOnClickListener {
-            finalizarPedido()
+            finalizarPedido(ProdutosPedidos) //ProdutosPedidos
         }
 
     }
-    fun carregarProdutos(checbR: Boolean, checbP: Boolean, checbS: Boolean) {
+    fun carregarProdutos(checbR: Boolean, checbP: Boolean, checbS: Boolean, ProdPedidos: MutableList<MutableMap<String, String>>) {
         val linearProdutos: LinearLayout = findViewById(R.id.produtos)
         linearProdutos.removeAllViews()
 
@@ -74,9 +78,9 @@ class MainActivity : AppCompatActivity() {
 
                         if(checbR || checbP || checbS){
                             if( (checbR && (type=="refrigerante")) || (checbP && (type=="pizza")) || (checbS && (type=="sobremesa")) )
-                                criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img)
+                                criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img, ProdPedidos)
                         }else
-                            criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img)
+                            criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img, ProdPedidos)
                         println(idProduto + " -teste " +type)
 
                     }
@@ -92,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         queue.add(stringReq)
     }
 
-    fun criarProdutosDinamicos(idProduto: String, type: String, nome:String, desc:String, qtd:String, preco:String, img:String){
+    fun criarProdutosDinamicos(idProduto: String, type: String, nome:String, desc:String, qtd:String, preco:String, img:String, ProdPedidos: MutableList<MutableMap<String, String>>){
         val linearProdutos: LinearLayout = findViewById(R.id.produtos)
         linearProdutos.scrollY
         var bloco = LinearLayout(this)
@@ -133,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         )
         adicionar.text = "Adicionar ao pedido"
         adicionar.setOnClickListener {
-            adicionarPedido(idProduto, nome, preco)
+            adicionarPedido(idProduto, nome, preco, ProdPedidos)
         }
 
         bloco.addView(imagev)
@@ -152,36 +156,66 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(espaco)
 
     }
-    fun adicionarPedido(id:String, nome:String, preco:String){
+    fun adicionarPedido(id:String, nome:String, preco:String, ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearPedido: LinearLayout = findViewById(R.id.pedidos)
+        linearPedido.removeAllViews()
         var total: TextView = findViewById(R.id.total)
+        if(alterarArray == 0){
+            ProdPedidos[0] = mutableMapOf("id" to id, "nome" to nome, "quant" to "1", "preco" to preco, "total" to preco)
+            alterarArray++
 
-        var bloco = LinearLayout(this)
-        //bloco linear layout de produto
-        bloco.orientation = LinearLayout.VERTICAL
-        bloco.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        //texto do produto
-        var novoTextView = TextView(this)
+            //println(ProdPedidos)
+        }else{
+            var verificar = false
+            for(i in 0  until  ProdPedidos.size){
+                println(ProdPedidos.size)
+                if(ProdPedidos[i]["id"] == id){
+                    verificar = true
+                    println(ProdPedidos[i])
+                    var quat = ProdPedidos[i]["quant"].toString().toInt() + 1
+                    var total = preco.toFloat() + ProdPedidos[i]["total"].toString().toFloat()
 
-        novoTextView.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        novoTextView.text = "Código: ${id} -> ${nome} R$ ${preco} \n "
-        novoTextView.textSize = 25F
+                    ProdPedidos[i] = mutableMapOf("id" to id, "nome" to nome, "quant" to quat.toString(), "preco" to preco, "total" to total.toString())
+                    println(ProdPedidos)
+                }
+            }
+            if(verificar == false)
+                ProdPedidos += mutableMapOf("id" to id, "nome" to nome, "quant" to "1", "preco" to preco, "total" to preco)
+        }
 
-        bloco.addView(novoTextView)
-        linearPedido.addView(bloco)
+        var valorTotalPedido = 0F
+        for(i in 0  until  ProdPedidos.size){
+            var bloco = LinearLayout(this)
+            //bloco linear layout de produto
+            bloco.orientation = LinearLayout.VERTICAL
+            bloco.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            //texto do produto
+            var novoTextView = TextView(this)
 
-        total.text = (total.text.toString().toFloat() + preco.toFloat()).toString()
+            novoTextView.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            novoTextView.text = "Código: ${ProdPedidos[i]["id"]} -> ${ProdPedidos[i]["nome"]} R$ ${ProdPedidos[i]["preco"]} \n Quantidade: ${ProdPedidos[i]["quant"]}x total: R$ ${ProdPedidos[i]["total"]}\n "
+            novoTextView.textSize = 25F
+            valorTotalPedido += ProdPedidos[i]["total"].toString().toFloat()
+
+            bloco.addView(novoTextView)
+            linearPedido.addView(bloco)
+
+            total.text = valorTotalPedido.toString()
+            //total.text = (total.text.toString().toFloat() + preco.toFloat()).toString()
+        }
+        //alterarArray++
 
     }
-    fun finalizarPedido(){
+    fun finalizarPedido(ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearpedido: LinearLayout = findViewById(R.id.pedidos)
         var total: TextView = findViewById(R.id.total)
+        ProdPedidos.clear()
         linearpedido.removeAllViews()
         total.text = "0"
         //...falta coisa (enviar post)
