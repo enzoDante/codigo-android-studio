@@ -203,7 +203,19 @@ class MainActivity : AppCompatActivity() {
             novoTextView.textSize = 25F
             valorTotalPedido += ProdPedidos[i]["total"].toString().toFloat()
 
+            //botao remover um elemento
+            val removerel = Button(this)
+            removerel.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            removerel.text = "remover um"
+            removerel.setOnClickListener {
+                removerElemento(i, ProdPedidos)
+            }
+
             bloco.addView(novoTextView)
+            bloco.addView(removerel)
             linearPedido.addView(bloco)
 
             total.text = valorTotalPedido.toString()
@@ -212,6 +224,60 @@ class MainActivity : AppCompatActivity() {
         //alterarArray++
 
     }
+    fun removerElemento(i: Int, ProdPedidos: MutableList<MutableMap<String, String>>){
+        var linearPedido: LinearLayout = findViewById(R.id.pedidos)
+        linearPedido.removeAllViews()
+        var total: TextView = findViewById(R.id.total)
+
+        if(ProdPedidos[i]["quant"].toString().toInt() > 1 ){
+            ProdPedidos[i]["quant"] = (ProdPedidos[i]["quant"].toString().toInt() - 1).toString()
+            ProdPedidos[i]["total"] = (ProdPedidos[i]["total"].toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
+            total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
+        }
+        else{
+            total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
+            ProdPedidos.removeAt(i)
+        }
+        var valorTotalPedido = 0F
+        for(i in 0  until  ProdPedidos.size){
+            var bloco = LinearLayout(this)
+            //bloco linear layout de produto
+            bloco.orientation = LinearLayout.VERTICAL
+            bloco.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            //texto do produto
+            var novoTextView = TextView(this)
+
+            novoTextView.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            novoTextView.text = "Código: ${ProdPedidos[i]["id"]} -> ${ProdPedidos[i]["nome"]} R$ ${ProdPedidos[i]["preco"]} \n Quantidade: ${ProdPedidos[i]["quant"]}x total: R$ ${ProdPedidos[i]["total"]}\n "
+            novoTextView.textSize = 25F
+            valorTotalPedido += ProdPedidos[i]["total"].toString().toFloat()
+
+            //botao remover um elemento
+            val removerel = Button(this)
+            removerel.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            removerel.text = "remover um"
+            removerel.setOnClickListener {
+                removerElemento(i, ProdPedidos)
+            }
+
+            bloco.addView(novoTextView)
+            bloco.addView(removerel)
+            linearPedido.addView(bloco)
+
+            total.text = valorTotalPedido.toString()
+            //total.text = (total.text.toString().toFloat() + preco.toFloat()).toString()
+        }
+    }
+
     fun finalizarPedido(ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearpedido: LinearLayout = findViewById(R.id.pedidos)
         var total: TextView = findViewById(R.id.total)
