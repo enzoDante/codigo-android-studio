@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.marginBottom
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -30,14 +31,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //array dos pedidos do usuario
         var ProdutosPedidos = mutableListOf(mutableMapOf("id" to "0", "nome" to "-", "quant" to "0", "preco" to "0.0", "total" to "0.0"))
 
         var btnFinalizar: Button = findViewById(R.id.btn)
         var checbRefri: CheckBox = findViewById(R.id.cbRefri)
         var checbPiz: CheckBox = findViewById(R.id.cbPiz)
         var checbSob: CheckBox = findViewById(R.id.cbSobr)
+        //carrega todos os produtos na tela
         carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
 
+        //carrega novamente todos os produtos, com a selecao
         checbRefri.setOnCheckedChangeListener { buttonView, isChecked ->
             carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
         }
@@ -48,11 +52,13 @@ class MainActivity : AppCompatActivity() {
             carregarProdutos(checbRefri.isChecked, checbPiz.isChecked, checbSob.isChecked, ProdutosPedidos)
         }
 
+        //botao de enviar p encaminhar pedido
         btnFinalizar.setOnClickListener {
             finalizarPedido(ProdutosPedidos) //ProdutosPedidos
         }
 
     }
+    //copiado helio, pega json e coisa a mais
     fun carregarProdutos(checbR: Boolean, checbP: Boolean, checbS: Boolean, ProdPedidos: MutableList<MutableMap<String, String>>) {
         val linearProdutos: LinearLayout = findViewById(R.id.produtos)
         linearProdutos.removeAllViews()
@@ -77,10 +83,13 @@ class MainActivity : AppCompatActivity() {
                         var preco = item.get("preco").toString();
                         var img = item.get("img").toString();
 
+                        //verifica se alguma checkbox for marcada
                         if(checbR || checbP || checbS){
+                            //verifica qual foi marcada e se o type eh o msm de definido do checkbox
                             if( (checbR && (type=="refrigerante")) || (checbP && (type=="pizza")) || (checbS && (type=="sobremesa")) )
                                 criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img, ProdPedidos)
                         }else
+                            //caso nada esteja selecionado
                             criarProdutosDinamicos(idProduto, type, nome, desc, qtd, preco, img, ProdPedidos)
                         println(idProduto + " -teste " +type)
 
@@ -117,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        //carregar img
+        //carregar img copiado do helio
         DownloadImageFromInternet(imagev).execute(img)
 
         //texto do produto
@@ -148,6 +157,7 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(bloco)
         var espaco = TextView(this)
 
+        //gambiarra p espacamento abaixo de outros produtos
         espaco.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -157,27 +167,31 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.addView(espaco)
 
     }
+    //ao clicar no botao do produto
     fun adicionarPedido(id:String, nome:String, preco:String, ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearPedido: LinearLayout = findViewById(R.id.pedidos)
         linearPedido.removeAllViews()
         var total: TextView = findViewById(R.id.total)
+        //o array tem valor inicial q deve ser removido
         if(alterarArray == 0){
             ProdPedidos[0] = mutableMapOf("id" to id, "nome" to nome, "quant" to "1", "preco" to preco, "total" to preco)
             alterarArray++
 
-            //println(ProdPedidos)
+            //adicionar ao array, os pedidos
         }else{
+            //boolean p caso n exista tal produto no array
             var verificar = false
+            //percorre o array
             for(i in 0  until  ProdPedidos.size){
-                println(ProdPedidos.size)
+                //verifica se ja existe tal produto no array pedidos, p adicionar + uma unidade
                 if(ProdPedidos[i]["id"] == id){
                     verificar = true
-                    println(ProdPedidos[i])
+                    //adiciona uma unidade a mais da existente
                     var quat = ProdPedidos[i]["quant"].toString().toInt() + 1
+                    //calcula o novo total
                     var total = preco.toFloat() + ProdPedidos[i]["total"].toString().toFloat()
-
+                    //altera o array, criando um novo dicionario com novos valores
                     ProdPedidos[i] = mutableMapOf("id" to id, "nome" to nome, "quant" to quat.toString(), "preco" to preco, "total" to total.toString())
-                    println(ProdPedidos)
                 }
             }
             if(verificar == false)
@@ -194,6 +208,7 @@ class MainActivity : AppCompatActivity() {
         var linearPedido: LinearLayout = findViewById(R.id.pedidos)
         var total: TextView = findViewById(R.id.total)
 
+        //cria um layout para determinado produto
         var bloco = LinearLayout(this)
         //bloco linear layout de produto
         bloco.orientation = LinearLayout.VERTICAL
@@ -201,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        //texto do produto
+        //texto do produto, detalhes e preco, etc
         var novoTextView = TextView(this)
 
         novoTextView.layoutParams = LinearLayout.LayoutParams(
@@ -220,42 +235,52 @@ class MainActivity : AppCompatActivity() {
         )
         removerel.text = "remover um"
         removerel.setOnClickListener {
+            //funcao p remover uma unidade do pedido
             removerElemento(i, ProdPedidos, total)
         }
 
+        //mostrando os elementos criados p o usuario
         bloco.addView(novoTextView)
         bloco.addView(removerel)
         linearPedido.addView(bloco)
 
         //total.text = valorTotalPedido.toString()
     }
+
+    //remove elemento dos pedidos
     fun removerElemento(i: Int, ProdPedidos: MutableList<MutableMap<String, String>>, total: TextView){
         var linearPedido: LinearLayout = findViewById(R.id.pedidos)
-        linearPedido.removeAllViews()
+        linearPedido.removeAllViews() //remove tudo p depois criar novamente com a atualizacao
 
+        //verifica se a quantidade maior q 1 para ser removido somente uma unidade
         if(ProdPedidos[i]["quant"].toString().toInt() > 1 ){
             ProdPedidos[i]["quant"] = (ProdPedidos[i]["quant"].toString().toInt() - 1).toString()
             ProdPedidos[i]["total"] = (ProdPedidos[i]["total"].toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
             total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
         }
         else{
+            //remove o elemento do linear layout de pedidos, no caso de ter somente 1 elemento de tal produto
             total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
             ProdPedidos.removeAt(i)
         }
-        var valorTotalPedido = 0F
+        //cria os pedidos com a atualizacao do array
         for(i in 0  until  ProdPedidos.size){
             criarElPedidos(i, ProdPedidos)
         }
     }
 
+    //array dos pedidos (dicionario dentro) na qual será enviada e esvaziada
     fun finalizarPedido(ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearpedido: LinearLayout = findViewById(R.id.pedidos)
         var total: TextView = findViewById(R.id.total)
-        ProdPedidos.clear()
-        linearpedido.removeAllViews()
+        ProdPedidos.clear() //limpa array
+        linearpedido.removeAllViews() //remove pedidos do linear layout
         total.text = "0"
         //...falta coisa (enviar post)
+        Toast.makeText(applicationContext, "Pedido encaminhado!", Toast.LENGTH_SHORT).show()
     }
+
+    //copiado do helio
     @SuppressLint("StaticFieldLeak")
     @Suppress("DEPRECATION")
     private inner class DownloadImageFromInternet(var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
