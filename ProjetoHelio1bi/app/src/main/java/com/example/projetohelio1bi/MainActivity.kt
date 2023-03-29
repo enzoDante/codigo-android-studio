@@ -22,6 +22,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.charset.Charset
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         linearProdutos.removeAllViews()
 
         val queue = Volley.newRequestQueue(this)
-        val url = "http://helioesperidiao.com/api.php"
+        val url = "http://helioesperidiao1.hospedagemdesites.ws/api.php" //http://helioesperidiao.com/api.php
         val requestBody = "id=1" + "&msg=test_msg"
         val stringReq : StringRequest =
             object : StringRequest(Method.POST, url,
@@ -190,6 +191,7 @@ class MainActivity : AppCompatActivity() {
                     var quat = ProdPedidos[i]["quant"].toString().toInt() + 1
                     //calcula o novo total
                     var total = preco.toFloat() + ProdPedidos[i]["total"].toString().toFloat()
+                    total = ((total * 100.0).roundToInt() / 100.0 ).toFloat() //duas casas decimais
                     //altera o array, criando um novo dicionario com novos valores
                     ProdPedidos[i] = mutableMapOf("id" to id, "nome" to nome, "quant" to quat.toString(), "preco" to preco, "total" to total.toString())
                 }
@@ -226,6 +228,7 @@ class MainActivity : AppCompatActivity() {
         novoTextView.text = "Código: ${ProdPedidos[i]["id"]} -> ${ProdPedidos[i]["nome"]} R$ ${ProdPedidos[i]["preco"]} \n Quantidade: ${ProdPedidos[i]["quant"]}x total: R$ ${ProdPedidos[i]["total"]}\n "
         novoTextView.textSize = 25F
         valorTotalPedido += ProdPedidos[i]["total"].toString().toFloat()
+        valorTotalPedido = ((valorTotalPedido * 100.0).roundToInt() / 100.0 ).toFloat() //duas casas decimais
 
         //botao remover um elemento
         val removerel = Button(this)
@@ -255,12 +258,20 @@ class MainActivity : AppCompatActivity() {
         //verifica se a quantidade maior q 1 para ser removido somente uma unidade
         if(ProdPedidos[i]["quant"].toString().toInt() > 1 ){
             ProdPedidos[i]["quant"] = (ProdPedidos[i]["quant"].toString().toInt() - 1).toString()
-            ProdPedidos[i]["total"] = (ProdPedidos[i]["total"].toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
-            total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
+            var totalvalor = ProdPedidos[i]["total"].toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()
+            totalvalor = ((totalvalor * 100.0).roundToInt() / 100.0).toFloat() //duas casas decimais
+
+            ProdPedidos[i]["total"] = totalvalor.toString()
+
+            totalvalor = total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()
+            totalvalor = ((totalvalor * 100.0).roundToInt() / 100.0).toFloat() //duas casas decimais
+            total.text = totalvalor.toString()
         }
         else{
             //remove o elemento do linear layout de pedidos, no caso de ter somente 1 elemento de tal produto
-            total.text = (total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()).toString()
+            var totalvalor = total.text.toString().toFloat() - ProdPedidos[i]["preco"].toString().toFloat()
+            totalvalor = ((totalvalor * 100.0).roundToInt() / 100.0).toFloat() //duas casas decimais
+            total.text = (totalvalor).toString()
             ProdPedidos.removeAt(i)
         }
         //cria os pedidos com a atualizacao do array
@@ -273,11 +284,14 @@ class MainActivity : AppCompatActivity() {
     fun finalizarPedido(ProdPedidos: MutableList<MutableMap<String, String>>){
         var linearpedido: LinearLayout = findViewById(R.id.pedidos)
         var total: TextView = findViewById(R.id.total)
-        ProdPedidos.clear() //limpa array
-        linearpedido.removeAllViews() //remove pedidos do linear layout
-        total.text = "0"
-        //...falta coisa (enviar post)
-        Toast.makeText(applicationContext, "Pedido encaminhado!", Toast.LENGTH_SHORT).show()
+        if(total.text.toString() != "0"){
+            ProdPedidos.clear() //limpa array
+            linearpedido.removeAllViews() //remove pedidos do linear layout
+            total.text = "0"
+            //...falta coisa (enviar post)
+            Toast.makeText(applicationContext, "Pedido encaminhado!", Toast.LENGTH_SHORT).show()
+        }else
+            Toast.makeText(applicationContext, "Insira algum produto!", Toast.LENGTH_SHORT).show()
     }
 
     //copiado do helio
