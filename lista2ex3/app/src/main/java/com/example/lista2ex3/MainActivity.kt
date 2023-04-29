@@ -1,5 +1,6 @@
 package com.example.lista2ex3
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(baseContext, "Adicionado com sucesso!", Toast.LENGTH_SHORT).show()
 
     }
+    //==============leitura de dados e transformando para ser utilizavel (valores["nome"])
     fun databasef(){
         val database = FirebaseDatabase.getInstance()
         val myRef = database.getReference("usuarios2/")
@@ -83,6 +85,9 @@ class MainActivity : AppCompatActivity() {
                 val value = dataSnapshot.getValue() as Map<String, String>
                 Log.d(TAG, "Value is: $value")
 
+                val linearDados: LinearLayout = findViewById(R.id.linearDados)
+                linearDados.removeAllViews()
+
                 for(i in value){
                     //criar os elementos na tela!!!!
                     println(i)
@@ -90,6 +95,8 @@ class MainActivity : AppCompatActivity() {
                     val valores = i.value as HashMap<String, String>
                     println(valores)
                     println(valores["altura"])
+                    //criar dinamicamente!=====================
+                    criarElementos(valores)
                 }
             }
 
@@ -98,21 +105,35 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Failed to read value.", error.toException())
             }
         })
+    }
+    fun criarElementos(valores: HashMap<String, String>){
+        val linearDados: LinearLayout = findViewById(R.id.linearDados)
+        linearDados.scrollY
+        //linearDados.removeAllViews()
 
+        var bloco = LinearLayout(this)
 
+        //bloco linear layout de produto
+        bloco.orientation = LinearLayout.VERTICAL
+        bloco.setBackgroundColor(Color.parseColor("#D6D6D6"))
 
-        /*val databaseGet = Firebase.database.reference
-        databaseGet.child("usuarios").get().addOnSuccessListener {
-            Log.i("firebase", "Got value ${it.value}")
-            println(it)
+        bloco.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
 
-            var texto: TextView = findViewById(R.id.nometext)
+        //texto do produto
+        var novoTextView = TextView(this)
 
-        }*/
+        novoTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        novoTextView.text = "Nome: ${valores["nome"]} altura: ${valores["altura"]} peso: ${valores["peso"]} imc: ${valores["imc"]}"
+        novoTextView.textSize = 20F
 
-        //var texto: TextView = findViewById(R.id.nometext)
-        //texto.text = myRef.toString()
-        //myRef.setValue(dados)
+        bloco.addView(novoTextView)
 
+        linearDados.addView(bloco)
     }
 }
