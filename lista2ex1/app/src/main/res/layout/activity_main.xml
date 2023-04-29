@@ -158,8 +158,14 @@
                 android:layout_height="wrap_content"
                 android:text="Olá !"
                 android:id="@+id/usuarioredefsenha"
+                android:textSize="30dp"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="A senha deve conter 6 caracteres ou mais!"
                 android:labelFor="@+id/editTextredef"
-                android:textSize="35dp"
+                android:textSize="30dp"
                 />
             <EditText
                 android:layout_width="match_parent"
@@ -173,6 +179,12 @@
                 android:layout_height="wrap_content"
                 android:text="Redefinir senha"
                 android:id="@+id/btnredef"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deletar conta!"
+                android:id="@+id/btndeleteconta"
                 />
 
         </LinearLayout>

@@ -70,12 +70,13 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     //tornar linear layouts invisiveis e mostrar outros
-                    var layoutlogcad: LinearLayout = findViewById(R.id.bntlogcad)
+                    /*var layoutlogcad: LinearLayout = findViewById(R.id.bntlogcad)
                     var layoutCad: LinearLayout = findViewById(R.id.linearCadastro)
                     var layoutLog: LinearLayout = findViewById(R.id.linearLogin)
                     layoutCad.isVisible = false
                     layoutLog.isVisible = false
-                    layoutlogcad.isVisible = false
+                    layoutlogcad.isVisible = false*/
+                    alterarvisibilidade(true)
                     //===outros
                     telaprincipal()
                     //============================================
@@ -113,17 +114,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun telaprincipal(){
-        var layoutprincipal: LinearLayout = findViewById(R.id.telaprincipal)
-        layoutprincipal.isVisible = true
+        //var layoutprincipal: LinearLayout = findViewById(R.id.telaprincipal)
+        //layoutprincipal.isVisible = true
         var bemvindotexto: TextView = findViewById(R.id.usuarioola)
         val user = FirebaseAuth.getInstance().currentUser
 
         bemvindotexto.text = "Bem vindo(a), ${user?.email.toString()}!"
 
         var btnredef: Button = findViewById(R.id.btnredef)
+        var btndeletec: Button = findViewById(R.id.btndeleteconta)
         btnredef.setOnClickListener {
             var nsenha: EditText = findViewById(R.id.editTextredef)
             redefinirsenha(nsenha.text.toString())
+        }
+        btndeletec.setOnClickListener {
+            deletarconta()
 
         }
     }
@@ -135,8 +140,32 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "Senha atualizada.")
                 Toast.makeText(baseContext, "Senha atualizada",Toast.LENGTH_SHORT).show()
             }else{
-                Toast.makeText(baseContext, "errooo",Toast.LENGTH_SHORT).show()
+                Toast.makeText(baseContext, "erro / senha deve conter mais de 6 caracteres",Toast.LENGTH_SHORT).show()
             }
         }
+    }
+    fun deletarconta(){
+        val user = FirebaseAuth.getInstance().currentUser
+        user!!.delete().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "usuario excluído.")
+                //var layoutprincipal: LinearLayout = findViewById(R.id.telaprincipal)
+                //layoutprincipal.isVisible = false
+                alterarvisibilidade(false)
+
+
+            }
+        }
+    }
+    fun alterarvisibilidade(logado:Boolean){
+        var layoutlogcad: LinearLayout = findViewById(R.id.bntlogcad)
+        var layoutCad: LinearLayout = findViewById(R.id.linearCadastro)
+        var layoutLog: LinearLayout = findViewById(R.id.linearLogin)
+        layoutCad.isVisible = !logado
+        layoutLog.isVisible = false
+        layoutlogcad.isVisible = !logado
+
+        var layoutprincipal: LinearLayout = findViewById(R.id.telaprincipal)
+        layoutprincipal.isVisible = logado
     }
 }
