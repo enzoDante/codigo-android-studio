@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainScreen">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5sp"
+        android:scrollbarSize="5sp"
+        tools:context=".MainScreen"
+        tools:layout_editor_absoluteX="40dp"
+        tools:layout_editor_absoluteY="-16dp">
+        <LinearLayout
+            android:id="@+id/linearLMainScr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            tools:ignore="MissingConstraints">
+
+            <LinearLayout
+                android:id="@+id/linearLMainScrHeader"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                >
+                <Button
+                    android:id="@+id/btnReload"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="reload"
+                    android:text="Reload"
+                    />
+
+                <Button
+                    android:id="@+id/btnCriarPost"
+                    android:layout_width="124dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="criarPost"
+                    android:text="Criar post"
+                    android:layout_marginStart="5dp"
+                    />
+
+                <Button
+                    android:id="@+id/btnAcessarConta"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="acessarConta"
+                    android:text="Conta"
+                    android:layout_marginStart="5dp"
+                    />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLMainScrPost"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:visibility="gone"
+                >
+
+                <Button
+                    android:id="@+id/btnPhotoPicker"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Escolher imagem"
+                    android:layout_marginStart="0dp"
+                    style="?android:attr/buttonBarButtonStyle"
+                    />
+
+                <ImageView
+                    android:id="@+id/imgPreview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                />
+
+                <EditText
+                    android:id="@+id/txtPost"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Legenda"
+                    />
+
+                <Button
+                    android:id="@+id/btnPostar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Postar"
+                    />
+
+            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearLPosts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            >
+
+        </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
