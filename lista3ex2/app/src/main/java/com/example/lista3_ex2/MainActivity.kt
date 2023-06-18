@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             salvarDados(y.toInt())
             Yantigo = y.toInt()
         }
-    //if(y.toInt() *2 > y.toInt()+1){       }
     }
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
     }
