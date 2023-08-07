@@ -24,10 +24,18 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 
-class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
+
+class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener, SensorEventListener {
     lateinit var textToSpeech: TextToSpeech
     lateinit var locationManager : LocationManager
+    lateinit var acelerometro: Sensor
+    lateinit var gerenciadorSensor: SensorManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +47,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     fun init(){
+        inicializarAcelerometro()
         val btn : Button = findViewById(R.id.btnFalar)
         carregarAudios()
         btn!!.setOnClickListener {
@@ -167,7 +176,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        novoTextView.text = "Audio"//${desc}
+        novoTextView.text = "Audio: ${texto}"//${desc}
         novoTextView.textSize = 20F
 
         //botao
@@ -235,9 +244,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     var salvar : Boolean = false
     fun salvarLocalizacao(){
-        println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        //println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         salvar = true
-        //escutarSom("Posição salva!")
+        escutarSom("Posição salva!")
     }
 
     private val locationListener: LocationListener = object : LocationListener {
@@ -246,7 +255,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             val latitude = location.latitude
             val longitude = location.longitude
             println("===-=-=--=-=-=-=--=-=-=--=-=-=-==-=")
-            if(salvar){
+            println(latitude)
+            println(longitude)
+            /*if(salvar){
                 println("aqqq teste")
                 val dados = HashMap<String, Any>()
                 dados["latitude"] = latitude.toString()
@@ -257,14 +268,37 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 myRef.setValue(dados)
                 escutarSom("Posição salva!")
                 salvar = false
-                /*myRef.push().setValue(novoCadastro).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        escutarSom("Posição salva!")
-                        salvar = false
-                    } else {
-                    }
-                }*/
-            }
+            }*/
         }
     }
+    fun inicializarAcelerometro(){
+        gerenciadorSensor = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        acelerometro = gerenciadorSensor.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        gerenciadorSensor.registerListener(this, this.acelerometro, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+    override fun onSensorChanged(event: SensorEvent?) {
+        //val lblAcelerometro: TextView = findViewById(R.id.lblAcelerometro)
+        var x: Float = 0f
+        var y: Float = 0f
+        var z: Float = 0f
+        if (event != null) {
+            x = event.values[0]
+            y = event.values[1]
+            z = event.values[2]
+            // Calcular a força resultante do acelerômetro
+            val acceleration = Math.sqrt((x * x + y * y + z * z).toDouble())
+
+            // Defina um valor de aceleração que indica uma queda (ajuste conforme necessário)
+            val threshold = 9.8 * 2.5 // 2.5 vezes a gravidade terrestre
+
+            // Verificar se a aceleração excede o limite definido
+            if (acceleration > threshold) {
+                escutarSom("Socorro, estou caindo!")
+            }
+        }
+        //lblAcelerometro.text = x.toString() + "\n" + y.toString() + "\n" + z.toString()
+    }
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+    }
+
 }
