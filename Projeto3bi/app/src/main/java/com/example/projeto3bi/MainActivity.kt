@@ -32,7 +32,8 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         textToSpeech = TextToSpeech(this, this)
-        permissoesUsuario();
+        permissoesUsuario()
+        permissoesUsuario2()
 
         init()
     }
@@ -52,11 +53,13 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         ),
             codigoIdentificacao
         )
-        val codigoIdentificacao2 = 200;
+    }
+    fun permissoesUsuario2(){
+        val codigoIdentificacao = 200;
         ActivityCompat.requestPermissions(
             this,
             arrayOf<String>(ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION),
-            codigoIdentificacao2
+            codigoIdentificacao
         )
 
     }
@@ -230,28 +233,37 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         super.onDestroy()
     }
 
+    var salvar : Boolean = false
     fun salvarLocalizacao(){
-        val salvar = true
+        println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        salvar = true
+        //escutarSom("Posição salva!")
     }
 
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
-            val database = FirebaseDatabase.getInstance()
-            val myRef = database.getReference("/localizacao/")
-
-            if(true){
-                val latitude = location.latitude
-                val longitude = location.longitude
-                val novoCadastro = mapOf(
-                    "latitude" to "${latitude}",
-                    "longitude" to "${longitude}"
-                )
-                myRef.push().setValue(novoCadastro).addOnCompleteListener { task ->
+           // val database = FirebaseDatabase.getInstance()
+            val latitude = location.latitude
+            val longitude = location.longitude
+            println("===-=-=--=-=-=-=--=-=-=--=-=-=-==-=")
+            if(salvar){
+                println("aqqq teste")
+                val dados = HashMap<String, Any>()
+                dados["latitude"] = latitude.toString()
+                dados["longitude"] = longitude.toString()
+                println(dados)
+                val database = FirebaseDatabase.getInstance()
+                val myRef = database.getReference("coordenadas/")
+                myRef.setValue(dados)
+                escutarSom("Posição salva!")
+                salvar = false
+                /*myRef.push().setValue(novoCadastro).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         escutarSom("Posição salva!")
+                        salvar = false
                     } else {
                     }
-                }
+                }*/
             }
         }
     }
